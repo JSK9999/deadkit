@@ -1,0 +1,33 @@
+{
+  "name": "deadkit",
+  "version": "0.1.0",
+  "description": "Find dead rules and unused skills in your AI coding setup",
+  "type": "module",
+  "bin": {
+    "deadkit": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "claude-code",
+    "cursor",
+    "ai-coding",
+    "rules",
+    "skills",
+    "linter",
+    "dead-code"
+  ],
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}
