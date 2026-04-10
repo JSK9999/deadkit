@@ -149,6 +149,36 @@ npx deadkit --json             # JSON output for CI/CD
 - `CLAUDE.md` (project root)
 - `.cursorrules` (Cursor)
 
+## Roadmap: From Linter to Observability
+
+deadkit is evolving from a one-shot linter into a full **AI coding infra observability** layer.
+
+### Phase 1: Linter (current)
+- [x] Dead rule detection (session log analysis)
+- [x] Unused skill detection
+- [x] Duplicate / overlap / vagueness analysis
+- [x] Token cost breakdown
+- [x] `--json` output
+- [x] GitHub Action / GitLab CI
+
+### Phase 2: Continuous Collection
+- [ ] `deadkit init` — install Claude Code hook for automatic per-session data collection
+- [ ] `.deadkit/history.json` — persistent metrics store across sessions
+- [ ] Per-rule hit tracking (which rules actually influenced responses)
+- [ ] Per-skill call frequency with timestamps
+
+### Phase 3: Trends & Alerts
+- [ ] `deadkit trend` — weekly/monthly token usage trends
+- [ ] `deadkit trend --chart` — terminal chart visualization
+- [ ] Token budget threshold — block PR if rules exceed N tokens
+- [ ] Skill drift detection — alert when skill usage pattern changes
+
+### Phase 4: Dashboard & Team
+- [ ] `deadkit dashboard` — web UI for rule/skill health
+- [ ] Team-wide rule analytics (aggregated across members)
+- [ ] Rule effectiveness scoring (did this rule improve code quality?)
+- [ ] Cross-tool comparison (Claude Code vs Cursor vs Codex)
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines.
