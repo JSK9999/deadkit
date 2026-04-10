@@ -26,7 +26,7 @@ const DOMAIN_PATTERNS: Array<{
   { name: "TypeScript", match: /typescript/i, extensions: [".ts", ".tsx"] },
   { name: "JavaScript/Web", match: /javascript|web/i, extensions: [".js", ".jsx", ".ts", ".tsx", ".html", ".css"] },
   { name: "Rust", match: /rust/i, extensions: [".rs"] },
-  { name: "Go", match: /golang|\/go\//i, extensions: [".go"] },
+  { name: "Go", match: /golang|\/go\/|go-build|go-reviewer/i, extensions: [".go"] },
   { name: "Java", match: /java\b/i, extensions: [".java"] },
   { name: "Kotlin", match: /kotlin/i, extensions: [".kt", ".kts"] },
   { name: "Swift", match: /swift/i, extensions: [".swift"] },
