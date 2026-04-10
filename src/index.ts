@@ -14,6 +14,21 @@ import { AnalysisResult } from "./types.js";
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
+  const command = args[0];
+
+  // Subcommands
+  if (command === "init") {
+    const { runInit } = await import("./commands/init.js");
+    await runInit();
+    return;
+  }
+
+  if (command === "trend") {
+    const { runTrend } = await import("./commands/trend.js");
+    await runTrend(args.includes("--json"));
+    return;
+  }
+
   const jsonMode = args.includes("--json");
   const cwd = process.cwd();
   const customPaths = args.filter((a) => !a.startsWith("-"));
