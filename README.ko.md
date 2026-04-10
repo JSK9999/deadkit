@@ -116,6 +116,36 @@ npx deadkit --json             # CI/CD용 JSON 출력
 - `CLAUDE.md` (프로젝트 루트)
 - `.cursorrules` (Cursor)
 
+## 로드맵: 린터에서 옵저버빌리티로
+
+deadkit은 일회성 린터에서 **AI 코딩 인프라 옵저버빌리티** 레이어로 진화합니다.
+
+### Phase 1: 린터 (현재)
+- [x] 죽은 규칙 감지 (세션 로그 분석)
+- [x] 미사용 스킬 감지
+- [x] 중복 / 겹침 / 모호함 분석
+- [x] 토큰 비용 분석
+- [x] `--json` 출력
+- [x] GitHub Action / GitLab CI
+
+### Phase 2: 지속적 수집
+- [ ] `deadkit init` — Claude Code 훅 설치, 매 세션 자동 데이터 수집
+- [ ] `.deadkit/history.json` — 세션 간 지표 누적 저장소
+- [ ] 규칙별 히트 추적 (어떤 규칙이 실제로 응답에 영향을 줬는지)
+- [ ] 스킬별 호출 빈도 + 타임스탬프
+
+### Phase 3: 트렌드 & 알림
+- [ ] `deadkit trend` — 주간/월간 토큰 사용량 추이
+- [ ] `deadkit trend --chart` — 터미널 차트 시각화
+- [ ] 토큰 예산 임계값 — 규칙이 N 토큰 초과하면 PR 차단
+- [ ] 스킬 드리프트 감지 — 스킬 사용 패턴 변화 알림
+
+### Phase 4: 대시보드 & 팀
+- [ ] `deadkit dashboard` — 규칙/스킬 건강 상태 웹 UI
+- [ ] 팀 단위 규칙 분석 (팀원 전체 집계)
+- [ ] 규칙 효과 점수 (이 규칙이 코드 품질을 개선했나?)
+- [ ] 크로스 도구 비교 (Claude Code vs Cursor vs Codex)
+
 ## 기여
 
 [CONTRIBUTING.md](CONTRIBUTING.md)에서 설정 방법과 가이드라인을 확인하세요.
