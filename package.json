@@ -1,6 +1,6 @@
 {
   "name": "deadkit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Find dead rules and unused skills in your AI coding setup",
   "type": "module",
   "bin": {
