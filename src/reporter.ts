@@ -10,7 +10,7 @@ export function printReport(result: AnalysisResult): void {
   const allTokens = totalTokens + skillTokens;
 
   console.log("");
-  console.log("deadkit v0.1.0");
+  console.log("deadkit v0.3.0");
   console.log("===============");
   console.log("");
   console.log(
