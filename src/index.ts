@@ -29,6 +29,13 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (command === "compare") {
+    const { runCompare } = await import("./commands/compare.js");
+    const comparePaths = args.slice(1).filter((a) => !a.startsWith("-"));
+    await runCompare(comparePaths, args.includes("--json"));
+    return;
+  }
+
   const jsonMode = args.includes("--json");
   const cwd = process.cwd();
   const customPaths = args.filter((a) => !a.startsWith("-"));
