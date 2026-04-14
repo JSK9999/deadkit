@@ -155,6 +155,35 @@ async function extractExtensionsFromLog(
   return extensions;
 }
 
+export interface SessionExtensions {
+  sessionId: string;
+  extensions: Set<string>;
+}
+
+export async function collectPerSessionExtensions(): Promise<SessionExtensions[]> {
+  const claudeDir = join(homedir(), ".claude", "projects");
+  if (!existsSync(claudeDir)) return [];
+
+  const sessions: SessionExtensions[] = [];
+  const projects = await readdir(claudeDir);
+
+  for (const project of projects) {
+    const projectDir = join(claudeDir, project);
+    const files = await safeReaddir(projectDir);
+    const jsonlFiles = files.filter((f) => f.endsWith(".jsonl"));
+
+    for (const jsonlFile of jsonlFiles) {
+      const filePath = join(projectDir, jsonlFile);
+      const extensions = await extractExtensionsFromLog(filePath);
+      if (extensions.size > 0) {
+        sessions.push({ sessionId: jsonlFile, extensions });
+      }
+    }
+  }
+
+  return sessions;
+}
+
 async function safeReaddir(dir: string): Promise<string[]> {
   try {
     return await readdir(dir);

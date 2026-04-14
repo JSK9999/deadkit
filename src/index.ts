@@ -29,6 +29,12 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (command === "report") {
+    const { runReport } = await import("./commands/report.js");
+    await runReport(args.includes("--json"));
+    return;
+  }
+
   if (command === "compare") {
     const { runCompare } = await import("./commands/compare.js");
     const comparePaths = args.slice(1).filter((a) => !a.startsWith("-"));
