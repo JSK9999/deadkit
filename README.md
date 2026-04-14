@@ -1,10 +1,33 @@
 # deadkit
 
-**You installed 136 rules. 61 are dead. 45% of your context window is gone.**
+**AI coding rule/skill usage analyzer and config optimizer.**
 
-If you installed [Everything Claude Code](https://github.com/affaan-m/everything-claude-code), [Oh My ClaudeCode](https://github.com/Yeachan-Heo/oh-my-claudecode), or any large rule/skill set — deadkit tells you what's actually working and what's just wasting tokens.
+You installed 136 rules and 5 skills. How many are actually doing something?
+
+> We tested [Everything Claude Code](https://github.com/affaan-m/everything-claude-code) against 34 real sessions:
+> **61 rules dead. 5 skills never called. 90K tokens wasted — 45% of context window.**
 
 **[한국어 README](README.ko.md)**
+
+## What deadkit does
+
+| # | Feature | Method | Accuracy |
+|---|---------|--------|----------|
+| 1 | **Dead rules** | Session logs: which languages you actually edit | Objective |
+| 2 | **Unused skills** | Session logs: which skills you actually call | Objective |
+| 3 | **Duplicates** | Jaccard similarity across rule files | Objective (0 false positives) |
+| 4 | **Token waste** | File size / 4 per rule and skill description | Objective |
+| 5 | **Claude default overlap** | 12 built-in behavior patterns | Semi-objective |
+| 6 | **Efficiency comparison** | Your usage data + token analysis | Objective |
+| 7 | **Usage trends** | PostToolUse hook tracking | Objective |
+
+## What deadkit does NOT do
+
+- ~~Rule compliance~~ — "Did Claude follow this rule?" requires LLM evaluation. A weaker model judging a stronger model's behavior is unreliable.
+- ~~Code quality proof~~ — Can't prove a rule *caused* better output.
+- ~~Effectiveness scoring~~ — Without the above two, this is impossible.
+
+**deadkit measures what's measurable. Nothing more.**
 
 ## Demo
 
@@ -16,18 +39,18 @@ If you installed [Everything Claude Code](https://github.com/affaan-m/everything
 npx deadkit
 ```
 
-No API keys. No setup. No runtime dependencies. Takes 1-3 seconds.
+No API keys. No setup. No runtime dependencies. 1-3 seconds.
 
 ## Who needs this
 
 - **Installed a large rule set** (ECC, OMC, gstack, superpowers) and don't know what's dead
 - **Skill collectors** who installed 30+ skills but only use 3
-- **Team leads** setting up AI coding standards — check config health before rollout
-- **Rule set authors** — validate your distribution before publishing
+- **Team leads** checking config health before rollout
+- **Rule set authors** validating their distribution
 
-If you wrote 5 rules yourself and know exactly what they do, you probably don't need this.
+If you wrote 5 rules yourself and know what they do, you probably don't need this.
 
-## What it finds
+## Example Output
 
 ```
 $ npx deadkit
@@ -46,10 +69,14 @@ DEAD RULES (based on 34 sessions across all projects)
   No dead rules found — all rules match your usage.
 
 SKILLS (5 installed, ~669 description tokens)
+
   Never used:
-    /investigate — never called
     /office-hours — never called
     /qa — never called
+    /review — never called
+
+  Used:
+    /investigate — 1 calls (last: 2026-04-13)
 
 OVERLAPPING DIRECTIVES (1 found)
   "Validate all external inputs"
@@ -65,32 +92,14 @@ TOKEN COST BREAKDOWN
   essential.md     ~169 tokens  ██░░░░░░░░  18%
 
 SUMMARY
-  5 UNUSED skill(s) — installed but never called
+  4 UNUSED skill(s) — installed but never called
   1 overlapping directive(s)
   3 redundant with Claude defaults
 ```
 
-### Rules (passive — loaded every prompt)
+## Compare
 
-| Check | How |
-|-------|-----|
-| **Dead rules** | Reads your session logs, checks which languages you actually edit. C++ rules but zero `.cpp` edits = dead. |
-| **Duplicates** | Jaccard similarity across rule files. Tested: 0 false positives. |
-| **Overlapping directives** | Same instruction copy-pasted across files. |
-| **Claude defaults** | 12 patterns matched against Claude's built-in behavior. |
-| **Token cost** | `file size / 4` per rule. Shows total context budget used. |
-
-### Skills (active — user calls them)
-
-| Check | How |
-|-------|-----|
-| **Never used** | Scans session logs for `Skill` tool calls. Installed but never invoked = unused. |
-| **Overlapping** | Similar descriptions may confuse Claude into picking the wrong skill. |
-| **Description cost** | Skill descriptions are loaded every session. 156 skills = ~15K tokens/session. |
-
-## Compare rule sets
-
-Compare efficiency of different setups against your actual usage:
+Compare efficiency of different rule sets against your actual usage:
 
 ```bash
 deadkit compare ./ecc-rules/ ./my-rules/
@@ -111,19 +120,16 @@ Efficiency              34.6%       95.3%
 Winner: my-rules (95.3% efficiency)
 ```
 
-Formula: `efficiency = effective tokens / total tokens`
-where `effective = total - dead - duplicate - redundant`
+`efficiency = effective tokens / total tokens`
 
-Based on YOUR session data. Same rule set scores differently for different users.
+Based on YOUR data. Same rule set scores differently for different users.
 
-## Continuous tracking
+## Continuous Tracking
 
 ```bash
 deadkit init    # Install hook (one-time)
-deadkit trend   # View trends after a few sessions
+deadkit trend   # View trends
 ```
-
-Installs a Claude Code PostToolUse hook that tracks every Edit/Write/Skill call to `~/.deadkit/history.jsonl`.
 
 ```
 deadkit trend
@@ -136,7 +142,6 @@ DAILY ACTIVITY
 
 TOP LANGUAGES
   .ts      11 edits
-  .tsx     1 edits
   .py      1 edits
 
 SKILL USAGE
@@ -178,44 +183,54 @@ deadkit:
     - if: $CI_MERGE_REQUEST_IID
 ```
 
-CI runs static analysis only (duplicates, tokens, vague). Dead rule detection requires local session logs.
+CI = static analysis only (duplicates, tokens). Dead rules/unused skills require local session logs.
+
+## CLI
+
+```bash
+npx deadkit                    # Analyze
+npx deadkit ./rules/ ./agents/ # Custom paths
+npx deadkit --json             # JSON output
+npx deadkit init               # Install tracking hook
+npx deadkit trend              # View trends
+npx deadkit compare <a> <b>    # Compare setups
+```
 
 ## Verified
 
 | Test | Result |
 |------|--------|
-| Dead rule accuracy | 136 ECC rules → 61 dead (10 languages, 0 edits). Correct. |
-| Duplicate detection | 0 false positives at Jaccard 0.6 threshold |
+| Dead rule accuracy | 136 ECC rules → 61 dead. Correct. |
+| Duplicate detection | 0 false positives |
 | Skill tracking | Verified against real JSONL logs |
 | Hook collection | Real-time capture confirmed |
-| Performance | 167MB logs, 32K lines → 1-3 seconds |
-| CI (GitHub Action) | PR comment auto-generated. [Tested.](https://github.com/JSK9999/deadrule/pull/6) |
+| Performance | 167MB, 32K lines → 1-3 seconds |
+| CI | PR comment tested and working |
 
 ## Known limitations
 
-- Dead rule detection only works for **language-specific** rules. Generic rules (`common/security.md`) are skipped.
-- "Use X" vs "Never use X" may be flagged as duplicates (negation words filtered as stop words).
-- Claude default list is manually maintained (12 patterns). Incomplete.
-- Cannot prove a rule *caused* better output — only that it's loaded and relevant (or not).
+- Dead rules: language-specific only. Generic rules (`common/security.md`) are skipped.
+- Negation blindness: "Use X" vs "Never use X" may be flagged as duplicates.
+- Claude defaults: 12 patterns, manually maintained, incomplete.
+- **Cannot measure rule compliance or code quality impact.** This is a fundamental limitation, not a roadmap item.
 
 ## Roadmap
 
-### Now: Config health for large rule sets
+### Now
 - [x] Dead rules, unused skills, duplicates, token cost
 - [x] Compare rule sets by efficiency
 - [x] Continuous tracking with hooks
 - [x] GitHub Action / GitLab CI
 
-### Next: Session-level observability
-- [ ] Per-session token analysis (how much context each session uses)
+### Next
 - [ ] Token budget alerts (warn when rules exceed threshold)
 - [ ] Weekly health report auto-generation
 - [ ] Terminal chart visualization
+- [ ] Per-session token analysis
 
-### Future: Team & cross-tool
+### Future
 - [ ] Team-wide config analytics
 - [ ] Cross-tool comparison (Claude Code vs Cursor vs Codex)
-- [ ] Rule effectiveness scoring (requires community baseline data)
 - [ ] Web dashboard
 
 ## Contributing
